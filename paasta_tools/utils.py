@@ -455,6 +455,10 @@ class PaastaColors:
     def default(text):
         return PaastaColors.color_text(PaastaColors.DEFAULT, text)
 
+    @staticmethod
+    def decolor(colored_text):
+        return re.sub('\x1b.*?m', '', colored_text)
+
 
 LOG_COMPONENTS = OrderedDict([
     ('build', {

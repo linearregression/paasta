@@ -704,6 +704,12 @@ def test_color_text():
     assert actual == expected
 
 
+def test_decolor_text():
+    colored_text = utils.PaastaColors.color_text(utils.PaastaColors.RED, "hi")
+    actual = utils.PaastaColors.decolor(colored_text)
+    assert actual == 'hi'
+
+
 def test_color_text_nested():
     expected = "%sred%sblue%sred%s" % (
         utils.PaastaColors.RED,

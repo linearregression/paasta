@@ -40,6 +40,7 @@ setup(
         # the Docker version deployed on PaaSTA servers
         'docker-py == 1.2.3',
         'dulwich == 0.10.0',
+        'gevent == 1.1.1',
         'humanize >= 0.5.1',
         'httplib2 >= 0.9,<= 1.0',
         'isodate >= 0.5.0',
@@ -49,6 +50,7 @@ setup(
         'mesos.cli == 0.1.5',
         'ordereddict >= 1.1',
         'path.py >= 8.1',
+        'pyramid == 1.7',
         'pysensu-yelp >= 0.2.2',
         'pytimeparse >= 1.1.0',
         'python-dateutil >= 2.4.0',
@@ -87,6 +89,7 @@ setup(
     package_data={'': ['cli/fsm/template/*/*', 'cli/schemas/*.json']},
     entry_points={'console_scripts': [
         'paasta=paasta_tools.cli.cli:main',
+        'paasta-api=paasta_tools.api.api:main',
         'paasta_autoscale_cluster=paasta_tools.autoscale_cluster:main',
         'paasta_cleanup_chronos_jobs=paasta_tools.cleanup_chronos_jobs:main',
         'paasta_check_chronos_jobs=paasta_tools.check_chronos_jobs:main',

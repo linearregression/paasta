@@ -103,37 +103,44 @@ def status_desired_state(service, instance, client, job_config):
     return "State:      %s - Desired state: %s" % (status, desired_state)
 
 
+def deploy_status_marathon_job(app, app_id, client):
+    if len(app.deployments) == 0:
+        deploy_status = PaastaColors.bold("Running")
+    elif app.instances == 0 and app.tasks_running == 0:
+        deploy_status = PaastaColors.grey("Stopped")
+    else:
+        # App is currently deploying so we should check the launch queue for more info
+        is_overdue, backoff_seconds = marathon_tools.get_app_queue_status(client, app_id)
+
+        if is_overdue:
+            deploy_status = "%s (new tasks are not launching due to lack of capacity)" % PaastaColors.red("Waiting")
+        elif backoff_seconds:
+            deploy_status = "%s (next task won't launch for %s seconds due to previous failures)" % (
+                            PaastaColors.red("Delayed"), backoff_seconds)
+        else:
+            deploy_status = PaastaColors.yellow("Deploying")
+    return deploy_status
+
+
+def compose_marathon_job_instance_count(running_instances, normal_instance_count):
+    if running_instances >= normal_instance_count:
+        status = PaastaColors.green("Healthy")
+        instance_count = PaastaColors.green("(%d/%d)" % (running_instances, normal_instance_count))
+    elif running_instances == 0:
+        status = PaastaColors.yellow("Critical")
+        instance_count = PaastaColors.red("(%d/%d)" % (running_instances, normal_instance_count))
+    else:
+        status = PaastaColors.yellow("Warning")
+        instance_count = PaastaColors.yellow("(%d/%d)" % (running_instances, normal_instance_count))
+    return status, instance_count
+
+
 def status_marathon_job(service, instance, app_id, normal_instance_count, client):
     name = PaastaColors.cyan(compose_job_id(service, instance))
     if marathon_tools.is_app_id_running(app_id, client):
         app = client.get_app(app_id)
-        running_instances = app.tasks_running
-
-        if len(app.deployments) == 0:
-            deploy_status = PaastaColors.bold("Running")
-        elif app.instances == 0 and app.tasks_running == 0:
-            deploy_status = PaastaColors.grey("Stopped")
-        else:
-            # App is currently deploying so we should check the launch queue for more info
-            is_overdue, backoff_seconds = marathon_tools.get_app_queue_status(client, app_id)
-
-            if is_overdue:
-                deploy_status = "%s (new tasks are not launching due to lack of capacity)" % PaastaColors.red("Waiting")
-            elif backoff_seconds:
-                deploy_status = "%s (next task won't launch for %s seconds due to previous failures)" % (
-                                PaastaColors.red("Delayed"), backoff_seconds)
-            else:
-                deploy_status = PaastaColors.yellow("Deploying")
-
-        if running_instances >= normal_instance_count:
-            status = PaastaColors.green("Healthy")
-            instance_count = PaastaColors.green("(%d/%d)" % (running_instances, normal_instance_count))
-        elif running_instances == 0:
-            status = PaastaColors.yellow("Critical")
-            instance_count = PaastaColors.red("(%d/%d)" % (running_instances, normal_instance_count))
-        else:
-            status = PaastaColors.yellow("Warning")
-            instance_count = PaastaColors.yellow("(%d/%d)" % (running_instances, normal_instance_count))
+        deploy_status = deploy_status_marathon_job(app, app_id, client)
+        status, instance_count = compose_marathon_job_instance_count(app.tasks_running, normal_instance_count)
         return "Marathon:   %s - up with %s instances. Status: %s" % (status, instance_count, deploy_status)
     else:
         red_not = PaastaColors.red("NOT")
