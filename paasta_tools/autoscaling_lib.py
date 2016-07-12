@@ -710,9 +710,9 @@ def scale_aws_spot_fleet_request(resource, current_capacity, target_capacity, so
     elif delta < 0:
         sfr_sorted_slaves = filter_sfr_slaves(sorted_slaves, resource['sfr'])
         log.info("SFR slave kill preference: {0}".format([slave['pid'] for slave in sfr_sorted_slaves]))
-        kill_capacity = sum([slave['instance_weight'] for slave in sfr_sorted_slaves])
+        killable_capacity = sum([slave['instance_weight'] for slave in sfr_sorted_slaves])
         amount_to_decrease = delta * -1
-        if amount_to_decrease > kill_capacity:
+        if amount_to_decrease > killable_capacity:
             log.error("Didn't find enough candidates to kill. This shouldn't happen so let's not kill anything!")
             return
         sfr_sorted_slaves.reverse()
