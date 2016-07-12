@@ -456,7 +456,6 @@ def get_sfr_instance_ips(sfr):
         except KeyError:
             log.warning("Instance {0} does not have an IP. This normally means it has been"
                         " terminated".format(instance['InstanceId']))
-            continue
     return instance_ips
 
 
