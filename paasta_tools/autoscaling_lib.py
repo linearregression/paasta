@@ -474,6 +474,13 @@ def get_sfr(spotfleet_request_id):
 
 
 def describe_instances(instance_ids):
+    """This wraps ec2.describe_instances and catches instance not
+    found errors. It returns a list of instance description
+    dictionaries. It assumes one instance per reservation (which
+    seems to be the case for SFRs)
+
+    :param instance_ids: a list of instance ids
+    :returns: a list of instance description dictionaries"""
     ec2_client = boto3.client('ec2')
     try:
         instances = ec2_client.describe_instances(InstanceIds=instance_ids)
