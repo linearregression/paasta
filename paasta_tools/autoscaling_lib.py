@@ -708,6 +708,7 @@ def scale_aws_spot_fleet_request(resource, current_capacity, target_capacity, so
     delta = target_capacity - current_capacity
     sfr_id = resource['id']
     if delta == 0:
+        log.info("Already at target capacity: {0}".format(target_capacity))
         return
     elif delta > 0:
         log.info("Increasing spot fleet capacity to: {0}".format(target_capacity))
