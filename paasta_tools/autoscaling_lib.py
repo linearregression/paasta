@@ -686,8 +686,8 @@ def set_spot_fleet_request_capacity(sfr_id, capacity, dry_run):
             return
     if dry_run:
         return
-    ec2_client.modify_spot_fleet_request(SpotFleetRequestId=sfr_id, TargetCapacity=capacity,
-                                         ExcessCapacityTerminationPolicy='noTermination')
+    return ec2_client.modify_spot_fleet_request(SpotFleetRequestId=sfr_id, TargetCapacity=capacity,
+                                                ExcessCapacityTerminationPolicy='noTermination')
 
 
 @register_autoscaling_component('aws_spot_fleet_request', SCALER_KEY)
